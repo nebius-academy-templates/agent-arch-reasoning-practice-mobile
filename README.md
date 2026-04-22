@@ -194,6 +194,65 @@ cp .claude/agents/rfc_writer.md.template .claude/agents/rfc_writer.md
 
 ---
 
+## Setting up the Mermaid diagram plugin
+
+The architecture agent can render and live-preview Mermaid diagrams in your browser using the **claude-mermaid** Claude Code plugin. This is optional but recommended — without it the agent can still write `.mmd` files, but you won't get live previews.
+
+The plugin is hosted on GitHub and must be registered as a custom marketplace source before installation.
+
+### 1. Register the marketplace source
+
+Add the following to your **user-level** Claude Code settings (`~/.claude/settings.json`). Create the file if it doesn't exist; merge with your existing config if it does.
+
+```json
+{
+  "extraKnownMarketplaces": {
+    "claude-mermaid": {
+      "source": {
+        "source": "github",
+        "repo": "veelenga/claude-mermaid"
+      }
+    }
+  }
+}
+```
+
+### 2. Install the plugin
+
+Open Claude Code (any project) and run:
+
+```
+/plugin install claude-mermaid
+```
+
+Claude Code will download the plugin from the GitHub repo and cache it locally. You will see a confirmation message when it is ready.
+
+### 3. Enable the plugin
+
+The install command enables the plugin automatically. You can verify it is active by checking that your `~/.claude/settings.json` now contains:
+
+```json
+"enabledPlugins": {
+  "claude-mermaid@claude-mermaid": true
+}
+```
+
+### 4. Verify it works
+
+From this project's root directory, open Claude Code and ask:
+
+```
+draw a simple mermaid flowchart with three boxes
+```
+
+A browser tab should open with a live-preview of the diagram. The tab auto-refreshes whenever the diagram is updated.
+
+### Permissions
+
+The `.claude/settings.json` in this repo already pre-approves the two mermaid tool calls (`mermaid_preview` and `mermaid_save`) so you will not be prompted to allow them during the exercise.
+
+---
+
 ## Submission checklist
 
 - [ ] At least one team lead `CLAUDE.md` exists in `team-lead/`, `team-lead-2/`, or `team-lead-3/`
