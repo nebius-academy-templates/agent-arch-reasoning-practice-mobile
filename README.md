@@ -1,6 +1,14 @@
-# Practice — Building an Architecture Reasoning Agent
+# Building an Architecture Reasoning Agent Workshop
 
-In this practice you will build agents from scratch: an engineering team lead chatbot, an architecture reasoning orchestrator, and an RFC writer subagent. The tools and data are provided — your job is to write the agent instructions.
+To get a head start, please clone the workshop repository before the session.
+
+In this practice, you’ll work through the full architecture reasoning workflow:
+- Gather and formalize requirements from a teamlead chatbot
+- Evaluate an existing architecture against those requirements
+- Design an agent that identifies gaps and proposes improvements
+- Generate an architecture diagram using Mermaid and MCP
+- Create a specialized subagent to write a structured RFC
+- Compare the output of the main agent and the subagent.
 
 The target codebase is **QPay** (`qpay-multiplatform/`), a fintech app built with Kotlin Multiplatform (KMP) and Compose Multiplatform. It targets Android and iOS from a single shared Kotlin codebase, with Decompose for navigation and Koin for DI.
 
@@ -62,7 +70,7 @@ arch-reasoning-agent-mobile/
 
 ---
 
-## Step 0 — Setup
+## Setup
 
 Verify the skills work:
 
@@ -80,35 +88,31 @@ Key files to read first:
 
 ---
 
-## Step 1 — Build a Team Lead chatbot
+Follow the instructor in the live session to build your agent or watch the recording and follow the steps below to catch up if you missed the session! 
 
-Two personas are available. Pick one (or build both for extra practice).
+## Step 1 — Talk to your Team Lead
+
+Two personas are available: Priya, Android Team Lead, and Marco, iOS Team Lead. 
 
 | Persona | Feature | Templates to copy |
 |---------|---------|-------------------|
 | Priya Malhotra | QR scanner / Scan-to-Pay | `teamlead-android/CLAUDE.md.template` → `teamlead-android/CLAUDE.md`<br>`.claude/agents/team_lead_android.md.template` → `.claude/agents/team_lead_android.md` |
 | Marco Reyes | Biometric auth | `teamlead-ios/CLAUDE.md.template` → `teamlead-ios/CLAUDE.md`<br>`.claude/agents/team_lead_ios.md.template` → `.claude/agents/team_lead_ios.md` |
 
-Each persona already has content filled in — the templates are complete, not blank. Read them, then optionally customise before running.
-
-Test the standalone chatbot for your chosen persona:
+Test the chatbot for your chosen persona:
 
 ```bash
 cd teamlead-android        # or teamlead-ios
 claude
 ```
 
-**Good opening questions by persona:**
-- Priya: *"Where should the camera preview surface live — in `androidApp` or `shared/androidMain`?"*
-- Marco: *"If Face ID fails, what exactly should the user see and which layer handles that?"*
-
-The team lead should answer in product/delivery language, push back on KMP boundary violations, and ask clarifying questions when architecture jargon appears.
+Collect the requirements. 
 
 ---
 
 ## Step 2 — Read and analyse the existing ADRs
 
-Before building the agent, spend 10 minutes reading the three ADRs in `data/adrs/` manually.
+Read the three ADRs in `data/adrs/`.
 
 - What was decided and when?
 - Which ADR touches the platform abstraction strategy for native APIs?
@@ -140,13 +144,6 @@ cp CLAUDE.md.template CLAUDE.md
 | **Guardrails** | Must include the ADR write gate and diagram gate |
 | **Failure handling** | What to do when each tool or subagent fails |
 
-### Required guardrails
-
-Your `CLAUDE.md` **must** include both of these rules:
-
-> `write_adr` must **not** be called unless the user's message contains **"write adr"**, **"save adr"**, or **"publish"**.
-
-> `save_diagram` must **not** be called before the user has selected a specific option.
 
 3. Run the agent:
 
@@ -169,38 +166,9 @@ Confirm it:
 
 ---
 
-## Step 4 — Add the RFC writer subagent
+## Step 4 — Add functionality via MCP 
 
-After the agent writes an ADR, it should produce a complete RFC document that combines everything: requirements, architecture, ADRs, diagram, and migration plan.
-
-1. Copy the template:
-
-```bash
-cp .claude/agents/rfc_writer.md.template .claude/agents/rfc_writer.md
-```
-
-2. Fill in every `[TODO]`:
-
-| Section | What to write |
-|---|---|
-| **Your role** | One-sentence identity |
-| **Purpose** | What document it produces and who reads it |
-| **RFC sections** | Ordered list of ≥ 8 sections the RFC must contain |
-| **Output format** | How each section is structured |
-| **Guardrails** | What the RFC writer must never do |
-
-3. Update your `CLAUDE.md` to invoke `rfc_writer` after the ADR is written. The subagent receives:
-   - Full company context
-   - All ADR content (existing + new)
-   - The selected architecture option
-   - Diagram path in `output/diagrams/`
-   - Requirements summary from the team lead session
-
-4. Re-run the full workflow and verify `output/rfc.md` is created.
-
----
-
-## Setting up the Mermaid diagram plugin
+### Setting up the Mermaid diagram plugin
 
 The architecture agent can render and live-preview Mermaid diagrams in your browser using the **claude-mermaid** Claude Code plugin. This is optional but recommended — without it the agent can still write `.mmd` files, but you won't get live previews.
 
@@ -255,6 +223,40 @@ The `.claude/settings.json` in this repo already pre-approves the two mermaid to
 
 ---
 
+
+## Add the RFC writer subagent 
+
+After the agent writes an ADR, it should produce a complete RFC document that combines everything: requirements, architecture, ADRs, diagram, and migration plan.
+
+1. Copy the template:
+
+```bash
+cp .claude/agents/rfc_writer.md.template .claude/agents/rfc_writer.md
+```
+
+2. Fill in every `[TODO]`:
+
+| Section | What to write |
+|---|---|
+| **Your role** | One-sentence identity |
+| **Purpose** | What document it produces and who reads it |
+| **RFC sections** | Ordered list of ≥ 8 sections the RFC must contain |
+| **Output format** | How each section is structured |
+| **Guardrails** | What the RFC writer must never do |
+
+3. Update your `CLAUDE.md` to invoke `rfc_writer` after the ADR is written. The subagent receives:
+   - Full company context
+   - All ADR content (existing + new)
+   - The selected architecture option
+   - Diagram path in `output/diagrams/`
+   - Requirements summary from the team lead session
+
+4. Re-run the full workflow and verify `output/rfc.md` is created.
+
+---
+
+
+
 ## Submission checklist
 
 - [ ] At least one team lead `CLAUDE.md` exists in `teamlead-android/` or `teamlead-ios/`
@@ -272,10 +274,3 @@ The `.claude/settings.json` in this repo already pre-approves the two mermaid to
 
 ---
 
-## Tips
-
-- Read `data/context/company.md` carefully — your agent's gap analysis should map directly to the KMP architectural constraints described there, especially the shared vs platform-specific code boundary.
-- Browse `qpay-multiplatform/shared/src/commonMain/` and `androidMain/` — the agent should reason about what the real code actually does, not just the company doc.
-- The write gate is the most important guardrail. Test that the agent does **not** call `write_adr` when you say "looks good" or "I approve".
-- If the agent skips a step, add more explicit ordering language to the workflow section ("do not proceed to step N until step N-1 is complete").
-- For Cursor or Windsurf: use the same template content, saved to `.cursor/rules/architecture-agent.mdc` or `.windsurfrules` respectively. For the Team Lead, open `teamlead-android/` or `teamlead-ios/` as a separate workspace root.
